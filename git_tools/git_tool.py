@@ -36,6 +36,7 @@ def main():
 
     root = Path(root_dir).expanduser().resolve()
 
+    all_path = []
     for repo_path in scan_repos(root):
         try:
             repo, commits = collect_since(repo_path, since_dt)
@@ -43,10 +44,13 @@ def main():
             print(f"跳过 {repo_path} : {e}")
             continue
         if commits:
-            print(f"\n>>> {repo_path} 当前分支：<{repo.active_branch.name}>, 远端：<{repo.remotes}>")
+            all_path.append(str(repo_path))
+            print(f"\n📌 >>> {repo_path} 当前分支：<{repo.active_branch.name}>, 远端：<{repo.remotes}>")
             for c in commits:
                 print(f"  {c['date'][:10]} {c['hash'][:8]}  {c['message']}")
             print('*' * 30)
+    print('🔗 可拷贝的文件夹')
+    print('\n'.join(all_path))
 
 
 if __name__ == "__main__":
