@@ -1,0 +1,1 @@
+yaw = euler_from_quaternion([self.qx, self.qy, self.qz, self.qw])[2]
