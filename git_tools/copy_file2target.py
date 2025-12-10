@@ -2,19 +2,55 @@ import shutil
 import os
 import datetime
 
-dirs = '''/home/hello/nav_override_ws/debug_src/nav2_costmap_2d
-/home/hello/nav_override_ws/src/hal_interface
-/home/hello/nav_override_ws/src/whstlidar_ros2_driver
+
+def delete_log_files_and_dirs(root_dir, dry_run=False):
+    """
+    递归删除指定目录下所有后缀为 .log 的文件和文件夹。
+
+    :param root_dir: 要扫描的根目录路径
+    :param dry_run: 是否为模拟运行（True：只打印，不删除；False：真实删除）
+    """
+    if not os.path.exists(root_dir):
+        print(f"❌ 路径不存在: {root_dir}")
+        return
+
+    print(f"🔍 开始扫描目录: {root_dir}")
+
+    for dirpath, dirnames, filenames in os.walk(root_dir, topdown=False):
+        # 1. 先处理文件：删除 .log 文件
+        for filename in filenames:
+            if filename.lower().endswith('.log'):
+                file_path = os.path.join(dirpath, filename)
+                if dry_run:
+                    print(f"📄 [模拟] 将删除文件: {file_path}")
+                else:
+                    try:
+                        os.remove(file_path)
+                        print(f"✅ 已删除文件: {file_path}")
+                    except Exception as e:
+                        print(f"❌ 删除文件失败 {file_path}: {e}")
+
+        # 2. 再处理文件夹：删除 .log 文件夹（注意：从下往上删，topdown=False）
+        for dirname in dirnames:
+            if dirname.lower().endswith('.log'):
+                dir_path = os.path.join(dirpath, dirname)
+                if dry_run:
+                    print(f"📁 [模拟] 将删除文件夹: {dir_path}")
+                else:
+                    try:
+                        shutil.rmtree(dir_path)
+                        print(f"✅ 已删除文件夹: {dir_path}")
+                    except Exception as e:
+                        print(f"❌ 删除文件夹失败 {dir_path}: {e}")
+
+    print("🎉 清理完成！")
+
+
+dirs = '''/home/hello/nav_override_ws/src/hal_interface
 /home/hello/nav_override_ws/src/zeromq_bridge
 /home/hello/nav_override_ws/src/agv_start_scrpts
-/home/hello/nav_override_ws/src/hik_agv_debug_tools
-/home/hello/nav_override_ws/override_src/nav2_behaviors
-/home/hello/nav_override_ws/override_src/nav2_mppi_controller
-/home/hello/nav_override_ws/override_src/nav2_controller
-/home/hello/nav_override_ws/override_src/nav2_regulated_pure_pursuit_controller
-/home/hello/nav_override_ws/override_src/nav2_bringup
-/home/hello/nav_override_ws/override_src/nav2_bt_navigator
-/home/hello/nav_override_ws/override_src/nav2_planner'''
+/home/hello/nav_override_ws/src/nav2_straight_planner
+/home/hello/nav_override_ws/override_src/nav2_controller'''
 
 time_str = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 target_dir = '/home/hello/backups/%s' % time_str  # 设置目标目录
@@ -47,6 +83,7 @@ for dir_path in dirs.strip().split('\n'):
                 if os.path.exists(folder_path):
                     shutil.rmtree(folder_path)
                     print(f"  已删除: {folder_path}")
+            delete_log_files_and_dirs(target_dir)
 
         except Exception as e:
             print(f"处理失败: {dir_path} - 错误: {str(e)}")
