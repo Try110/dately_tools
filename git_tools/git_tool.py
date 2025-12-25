@@ -31,7 +31,7 @@ def collect_since(repo_path: Path, since: datetime):
 
 def main():
     root_dir = '/home/hello/nav_override_ws'
-    since_date = '2025-12-06'
+    since_date = '2025-12-10'
     since_dt = datetime.strptime(since_date, "%Y-%m-%d")
 
     root = Path(root_dir).expanduser().resolve()

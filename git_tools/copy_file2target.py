@@ -1,6 +1,9 @@
 import shutil
 import os
 import datetime
+import sys
+
+from loguru import logger
 
 
 def delete_log_files_and_dirs(root_dir, dry_run=False):
@@ -46,11 +49,18 @@ def delete_log_files_and_dirs(root_dir, dry_run=False):
     print("🎉 清理完成！")
 
 
-dirs = '''/home/hello/nav_override_ws/src/hal_interface
-/home/hello/nav_override_ws/src/zeromq_bridge
-/home/hello/nav_override_ws/src/agv_start_scrpts
-/home/hello/nav_override_ws/src/nav2_straight_planner
-/home/hello/nav_override_ws/override_src/nav2_controller'''
+def save_log():
+    logger.add("save.log")
+    logger.info('🎉' * 5 + target_dir + '🎉' * 5)
+    for item in dirs.split('\n'):
+        logger.info(item)
+    logger.info('*' * 20 + '*' * 20)
+
+
+dirs = '''/home/hello/nav_override_ws/src/agv_start_scrpts
+/home/hello/nav_override_ws/override_src/nav2_controller
+/home/hello/nav_override_ws/override_src/nav2_bt_navigator
+/home/hello/nav_override_ws/override_src/nav2_planner'''
 
 time_str = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 target_dir = '/home/hello/backups/%s' % time_str  # 设置目标目录
@@ -91,3 +101,4 @@ for dir_path in dirs.strip().split('\n'):
         print(f"源目录不存在: {dir_path}")
 
 print("所有目录复制和清理完成！")
+save_log()
